@@ -14,6 +14,24 @@ let playerTwoMoveTwoValue;
 let playerTwoMoveThreeValue;
 
 const setPlayerMoves = (player, type1, value1, type2, value2, type3, value3) => {
+	const types = [type1, type2, type3];
+	const values = [value1, value2, value3];
+	for (i =0; i< values.length; i++){
+		if (values[i] === undefined){
+			return;
+		}
+		if (values[i] < 1 || values[i] > 99 ){
+			return;
+		}
+	}
+	for (i =0; i< types.length; i++){
+		if (types[i] === undefined){
+			return;
+		}
+	}
+	if ((type1 + type2 + type3) > 99){
+		return;
+	}
 	if (player === 'Player One'){
 		playerOneMoveOneType = type1;
 		playerOneMoveTwoType = type2;
