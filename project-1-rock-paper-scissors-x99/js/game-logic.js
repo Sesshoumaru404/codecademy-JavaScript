@@ -113,8 +113,43 @@ const getRoundWinner = (round) => {
 };
 
 
-getGameWinner  = () => {
+const getGameWinner  = () => {
+	let round1 = getRoundWinner(1);
+	let round2 = getRoundWinner(2);
+	let round3 = getRoundWinner(3);
 
+	if (!round1 || !round2 || !round3 ){
+		return null;
+	}
+	// If at two round are same we have a winner else its a tie  
+	if (round1 === round2 || round1 === round3 ){
+		return round1; 
+	} else if (round2 === round3 ) {
+		return round2;
+	} else {
+		return "Tie";
+	}
 }
 
+const setComputerMoves = () => {
+	let totalValue = 99; 
+	const getRandType = () => {
+		let rand = Math.floor(Math.random() * 3 );
+		return ['rock', 'paper', 'scissors'][rand];
+	};
+	const getRandVal = () => {
+		let rand = Math.floor(Math.random() * ( totalValue - 1) + 1);
+		totalValue = totalValue - rand ;
+		return rand;
+	};
 
+	playerTwoMoveOneType = getRandType();
+	playerTwoMoveTwoType = getRandType();
+	playerTwoMoveThreeType = getRandType();
+
+	playerTwoMoveOneValue = getRandVal();
+	playerTwoMoveTwoValue = getRandVal();
+	playerTwoMoveThreeValue = totalValue;
+
+
+};
