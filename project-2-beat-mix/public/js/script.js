@@ -1,32 +1,34 @@
 // Drum Arrays
-const kicks = [];
-const snares = [];
-const hiHats = [];
-const rideCymbals = [];
 
-for(i=0;i<16;i++){
-	kicks[i] = false;
-	snares[i] = false;
-	hiHats[i] = false;
-	rideCymbals[i] = false;
-}
+const createEmptyDrumArray = () => new Array(16).fill(false);
 
-const toggleDrum = (type, index) => {
+let kicks = createEmptyDrumArray();
+let snares = createEmptyDrumArray();
+let hiHats = createEmptyDrumArray();
+let rideCymbals = createEmptyDrumArray();
+
+
+
+const toggleDrum = (name, index) => {
+	const arrayDrum = validArray(name);
+
 	if (!validIndex(index)) {return;}
-	if (!validArray(type)) {return;}
 
-	if (type[index] === true) { return type[index] = false;} 
-
-	return type[index] = true;
+	arrayDrum[index] = !arrayDrum[index];
 	
 };
 
-const clear = (array) => {
-	if (!validArray(array)) {return;}
-	for(i=0;i<16;i++){
-		array[i] = false;
-	}
+const clear = (name) => {
+	const arrayDrum = validArray(name);
+	if (arrayDrum) {arrayDrum.fill(false)};
+}
 
+const invert = (name) => {
+	const arrayDrum = validArray(name);
+	if (!arrayDrum) {return};
+	for (let i = 0; i < arrayDrum.length; i++){
+		arrayDrum[i] = !arrayDrum[i];
+	}
 }
 
 const validIndex = (index) => {
@@ -39,10 +41,27 @@ const validIndex = (index) => {
 }
 
 const validArray = (array) => {
-	if (array === kicks ) {return true;}
-	if (array === snares ) {return true;}
-	if (array === hiHats ) {return true;}
-	if (array === rideCymbals) {return true;}
+	if (array === 'kicks' ) {return kicks;}
+	if (array === 'snares' ) {return snares;}
+	if (array === 'hiHats' ) {return hiHats;}
+	if (array === 'rideCymbals') {return rideCymbals;}
 	return false;
 
 }
+
+
+const getNeighborPads = (x, y, size) => {
+	const neighborPads = [];
+		if (x >= size || y >= size || x < 0 || y < 0 || size < 1) {
+			return neighborPads;
+		}
+		neighborPads.push([x - 1, y]);
+		neighborPads.push([x, y - 1]);
+		neighborPads.push([x + 1, y]);
+		neighborPads.push([x, y + 1]);
+		return neighborPads.filter((neighbor) => {
+		    return neighbor.every((val) => {
+				return val >= 0 && val < size;
+			});
+		});
+};
