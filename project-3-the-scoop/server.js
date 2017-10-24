@@ -14,17 +14,6 @@ const routes = {
   '/users/:username': {
     'GET': getUser
   },
-  '/comments': {
-    'GET': getComments,
-    'POST': createComment
-  },
-  '/comments/:id' :{
-    'GET': getComment,
-    'PUT': updateComment,
-    'DELETE': deleteComment
-  }, 
-  '/comments/:id/upvote' :{}, 
-  '/comments/:id/downvote' :{}, 
   '/articles': {
     'GET': getArticles,
     'POST': createArticle
@@ -39,111 +28,23 @@ const routes = {
   },
   '/articles/:id/downvote': {
     'PUT': downvoteArticle
+  },
+  '/comments': {
+    'GET': getComments,
+    'POST': createComment
+  },
+  '/comments/:id' :{
+    'GET': getComment,
+    'PUT': updateComment,
+    'DELETE': deleteComment
+  }, 
+  '/comments/:id/upvote' :{
+    'PUT': upvoteComment
+  }, 
+  '/comments/:id/downvote' :{
+    'PUT': downvoteComment
   }
 };
-
-function getComments(url, request) {
-  const response = {};
-
-  response.status = 200;
-  response.body = {
-    comments: Object.keys(database.comments)
-        .map(commentId => database.comments[commentId])
-        .filter(comment => comment)
-        .sort((comment1, comment2) => comment2.id - comment1.id)
-  };
-
-  return response;
-}
-
-function getComment(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
-  const comment = database.comments[id];
-  const response = {};
-
-  if (commentme) {
-    comment.comments = comment.commentIds.map(
-      commentId => database.comments[commentId]);
-
-    response.body = {comment: comment};
-    response.status = 200;
-  } else if (id) {
-    response.status = 404;
-  } else {
-    response.status = 400;
-  }
-
-  return response;
-}
-
-function createComment(url, request) {
-  const requestComment = request.body && request.body.comment;
-  const response = {};
-
-  if (requestComment && requestComment.body && requestComment.articleId &&
-    database.articles[requestComment.articleId] && requestComment.username && database.users[requestComment.username]) {
-    const comment = {
-      id: database.nextCommentId++,
-      body: requestComment.body,
-      username: requestComment.username,
-      articleId: requestComment.articleId,
-      upvotedBy: [],
-      downvotedBy: []
-    };
-
-    database.comments[comment.id] = comment;
-    database.articles[comment.articleId].commentIds.push(comment.id);
-    database.users[comment.username].commentIds.push(comment.id);
-
-    response.body = {comment: comment};
-    response.status = 201;
-  } else {
-    response.status = 400;
-  }
-
-  return response;
-}
-
-function updateComment(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
-  const savedComment = database.comments[id];
-  const requestComment = request.body && request.body.comment;
-  const response = {};
-
-  if (!id || !requestComment) {
-    response.status = 400;
-  } else if (!savedComment) {
-    response.status = 404;
-  } else {
-    savedComment.body = requestComment.body || savedComment.body;
-
-    response.body = {comment: savedComment};
-    response.status = 200;
-  }
-
-  return response;
-} 
-
-function deleteComment(url, request) {
-  const id = Number(url.split('/').filter(segment => segment)[1]);
-  const savedComment = database.comments[id];
-  const response = {};
-
-  if (savedComment) {
-    database.comments[id] = null;
-    const comment = database.comments[commentId];
-    database.comments[commentId] = null;
-    const userCommentIds = database.users[comment.username].commentIds;
-    userCommentIds.splice(userCommentIds.indexOf(id), 1);
-    const articleCommentIds = database.articles[comment.username].commentIds;
-    articleCommentIds.splice(articleCommentIds.indexOf(id), 1);
-    response.status = 204;
-  } else {
-    response.status = 400;
-  }
-
-  return response;
-}
 
 function getUser(url, request) {
   const username = url.split('/').filter(segment => segment)[1];
@@ -357,6 +258,168 @@ function downvote(item, username) {
 }
 
 // Write all code above this line.
+
+function getComments(url, request) {
+  const response = {};
+
+  response.status = 200;
+  response.body = {
+    comments: Object.keys(database.comments)
+        .map(commentId => database.comments[commentId])
+        .filter(comment => comment)
+        .sort((comment1, comment2) => comment2.id - comment1.id)
+  };
+
+  return response;
+}
+
+function getComment(url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const comment = database.comments[id];
+  const response = {};
+
+  if (commentme) {
+    comment.comments = comment.commentIds.map(
+      commentId => database.comments[commentId]);
+
+    response.body = {comment: comment};
+    response.status = 200;
+  } else if (id) {
+    response.status = 404;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
+}
+
+function createComment(url, request) {
+  const requestComment = request.body && request.body.comment;
+  const response = {};
+
+  if (requestComment && requestComment.body && requestComment.articleId &&
+    database.articles[requestComment.articleId] && requestComment.username && database.users[requestComment.username]) {
+    const comment = {
+      id: database.nextCommentId++,
+      body: requestComment.body,
+      username: requestComment.username,
+      articleId: requestComment.articleId,
+      upvotedBy: [],
+      downvotedBy: []
+    };
+
+    database.comments[comment.id] = comment;
+    database.articles[comment.articleId].commentIds.push(comment.id);
+    database.users[comment.username].commentIds.push(comment.id);
+
+    response.body = {comment: comment};
+    response.status = 201;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
+}
+
+function updateComment(url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const savedComment = database.comments[id];
+  const requestComment = request.body && request.body.comment;
+  const response = {};
+
+  if (!id || !requestComment) {
+    response.status = 400;
+  } else if (!savedComment) {
+    response.status = 404;
+  } else {
+    savedComment.body = requestComment.body || savedComment.body;
+
+    response.body = {comment: savedComment};
+    response.status = 200;
+  }
+
+  return response;
+} 
+
+function deleteComment(url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const savedComment = database.comments[id];
+  const response = {};
+
+  if (savedComment) {
+    database.comments[id] = null;
+    const userCommentIds = database.users[savedComment.username].commentIds;
+    userCommentIds.splice(userCommentIds.indexOf(id), 1);
+    const articleCommentIds = database.articles[savedComment.articleId].commentIds;
+    articleCommentIds.splice(articleCommentIds.indexOf(id), 1);
+    response.status = 204;
+  } else {
+    response.status = 404;
+  }
+
+  return response;
+}
+
+
+function upvoteComment(url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const username = request.body && request.body.username;
+  let savedComment = database.comments[id];
+  const response = {};
+
+  if (savedComment && database.users[username]) {
+    savedComment = upvote(savedComment, username);
+
+    response.body = {comment: savedComment};
+    response.status = 200;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
+}
+
+function downvoteComment(url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const username = request.body && request.body.username;
+  let savedComment = database.comments[id];
+  const response = {};
+
+  if (savedComment && database.users[username]) {
+    savedComment = downvote(savedComment, username);
+
+    response.body = {comment: savedComment};
+    response.status = 200;
+  } else {
+    response.status = 400;
+  }
+
+  return response;
+}
+
+  const yaml = require('js-yaml');
+  const fs = require('fs');
+
+function saveDatabase(){
+  
+  // try {
+      const data = yaml.safeDump(database);
+      fs.writeFile("database.yml", data); 
+      
+  // } catch (e) {
+  //     console.log(e);
+  // }
+}
+
+function loadDatabase(){
+    // response.status = 400;
+  // try {
+      const data = yaml.safeLoad(fs.readFileSync('database.yml', 'utf8'));
+      return data;
+  // } catch (e) {
+  //     console.log(e);
+  // }
+}
 
 const http = require('http');
 const url = require('url');
