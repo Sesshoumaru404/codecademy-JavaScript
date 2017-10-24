@@ -406,8 +406,12 @@ function saveDatabase(){
 }
 
 function loadDatabase(){
-  const data = yaml.safeLoad(fs.readFileSync('database.yml', 'utf8'));
-  return data;
+	try{
+	  const data = yaml.safeLoad(fs.readFileSync('database.yml', 'utf8'));
+		return data;
+	} catch(e) {
+  		fs.writeFile("database.yml"); 
+	}
 }
 
 const http = require('http');
