@@ -401,24 +401,13 @@ function downvoteComment(url, request) {
   const fs = require('fs');
 
 function saveDatabase(){
-  
-  // try {
-      const data = yaml.safeDump(database);
-      fs.writeFile("database.yml", data); 
-      
-  // } catch (e) {
-  //     console.log(e);
-  // }
+  const data = yaml.safeDump(database);
+  fs.writeFile("database.yml", data); 
 }
 
 function loadDatabase(){
-    // response.status = 400;
-  // try {
-      const data = yaml.safeLoad(fs.readFileSync('database.yml', 'utf8'));
-      return data;
-  // } catch (e) {
-  //     console.log(e);
-  // }
+  const data = yaml.safeLoad(fs.readFileSync('database.yml', 'utf8'));
+  return data;
 }
 
 const http = require('http');
