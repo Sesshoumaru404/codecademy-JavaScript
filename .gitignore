@@ -16,3 +16,5 @@ project-3-the-scoop/npm-debug.log
 project-3-the-scoop/database.yml
 project-4-boss-machine/npm-debug.log 
 project-5-gold-medal-metrics/npm-debug.log 
+project-5-gold-medal-metrics/*.sqlite 
+project-5-gold-medal-metrics/test/*.sqlite 
