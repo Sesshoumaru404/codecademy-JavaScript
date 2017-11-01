@@ -1,8 +1,7 @@
 const express = require('express');
 const apiRouter = express.Router();
-const	workRouter = require('./workRouter');
+const workRouter = require('./workRouter');
 const db = require('./db');
-const checkMillionDollarIdea = require('./checkMillionDollarIdea');
 
 // Checks if param is a valid model
 apiRouter.param('model', (req, res, next, id) => {
@@ -22,15 +21,15 @@ apiRouter.param('id', (req, res, next, id) => {
 	const idtoFind = Number(id);
 	const validID = db.getFromDatabaseById(requestModel, `${idtoFind}`);
 	if (idtoFind && validID) {
-		req.idtoFind = idtoFind;
+		req.validID = validID;
 		next();
 	} else {
-		res.status(404).send(`#{request} #{id} Not Found.`);
+		res.status(404).send(`${requestModel} ${id} Not Found.`);
 	}
 });
 
 
-apiRouter.use('/minions/:id/work', workRouter);
+apiRouter.use('/:model/:id/work', workRouter);
 
 // Get all of one type of model
 apiRouter.get('/:model', (req, res, next) => {
@@ -39,22 +38,16 @@ apiRouter.get('/:model', (req, res, next) => {
 	if (allModels) {
 		res.send(allModels);
 	} else {
-		res.status(404).send(`#{model}: Not Found`);
+		res.status(404).send(`${model}: Not Found`);
 	}
 })
 
 // Get one of one type of model
-apiRouter.get('/:model/:id', (req, res, next) => {
-	const idtoFind = req.idtoFind;
-	const displayData = db.getFromDatabaseById(req.reqModel, `${idtoFind}`);
-	if (displayData){
-		res.send(displayData);
-	} else {
-		res.status(404).send();
-	}
-})
+apiRouter.get('/:model/:id', (req, res, next) => {res.send(req.validID);})
 
 // Create a new instance for a model
+const checkMillionDollarIdea = require('./checkMillionDollarIdea');
+
 apiRouter.post('/:model', checkMillionDollarIdea, (req, res, next) => {
 	const model = req.reqModel;
 	let reqbody = req.body;
@@ -70,8 +63,7 @@ apiRouter.post('/:model', checkMillionDollarIdea, (req, res, next) => {
 
 // Updates an instance in a model
 apiRouter.put('/:model/:id', checkMillionDollarIdea, (req, res, next) => {
-  const updatebody = req.body;
-  const updatemodel = db.updateInstanceInDatabase(req.reqModel, updatebody);
+  let updatemodel = db.updateInstanceInDatabase(req.reqModel, req.body);
   if (updatemodel) {
   	res.send(updatemodel);
   } else {
@@ -82,13 +74,7 @@ apiRouter.put('/:model/:id', checkMillionDollarIdea, (req, res, next) => {
 // Deletes an instance in a model
 apiRouter.delete('/:model/:id', (req, res, next) => {
 	const model = req.reqModel;
-	const idtoFind = req.idtoFind;
-	let deleteInstance;
-	if (model.match('meetings')) {
-		deleteInstance = db.deleteAllFromDatabase('meetings');
-	} else {
-		deleteInstance = db.deleteFromDatabasebyId(model,`${idtoFind}`)
-	}
+	let deleteInstance = db.deleteFromDatabasebyId(model,`${req.validID.id}`);
 	if (deleteInstance){
 		res.status(204).send();
 	} else {
@@ -109,18 +95,6 @@ apiRouter.delete('/:model', (req, res, next) => {
 	} else {
   		res.status(404).send();
  	}
-});
-
-// Add your error handler here:
-apiRouter.use((err, req, res, next) => {
-  let status;
-  if (err.status){
-    status = err.status;
-  }else {
-    status = 500;
-  }
-  console.log(err.message);
-  res.status(status).send(err.message);
 });
 
 module.exports = apiRouter;
