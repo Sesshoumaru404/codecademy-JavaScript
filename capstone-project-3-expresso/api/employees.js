@@ -4,7 +4,7 @@ const employeesRouter = express.Router();
 const timesheetRouter = require('./timesheet');
 
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database(process.env.TEST_DATABASE || '../database.sqlite');
+const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
 // Checks if param is a valid employee
 employeesRouter.param('employeeId', (req, res, next, id) => {

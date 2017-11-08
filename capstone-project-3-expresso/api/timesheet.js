@@ -1,6 +1,6 @@
 const timesheetRouter = require('express').Router({mergeParams: true});
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database(process.env.TEST_DATABASE || '../database.sqlite');
+const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
 // Checks if param is a valid model
 timesheetRouter.param('timesheetId', (req, res, next, timesheet) => {

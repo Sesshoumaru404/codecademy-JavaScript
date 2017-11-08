@@ -4,7 +4,7 @@ const menusRouter = express.Router();
 const itemsRouter = require('./menuitems');
 
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database(process.env.TEST_DATABASE || '../database.sqlite');
+const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
 // Checks if param is a valid employee
 menusRouter.param('menuId', (req, res, next, id) => {
@@ -88,16 +88,14 @@ menusRouter.put('/:menuId', (req, res, next) => {
 // Delete Menu 
 menusRouter.delete('/:menuId', (req, res, next) => {
 
-	db.get(`SELECT * FROM MenuItem WHERE menu_id = $menuId`,
+	db.get('SELECT * FROM MenuItem WHERE menu_id = $menuId',
 		{$menuId : req.params.menuId},
 		(err, row) => {
 		if (err) {
-			return next(err);
+			next(err);
 		}
 		if (row){
-			var newError = new Error("Can't delete: Has related menu items.");
-			newError.status = 400;
-			next(err);
+			res.status(400).send();
 		} else {
 			db.run("DELETE FROM Menu WHERE id = ?1", {
 				1:  Number(req.menu.id)

@@ -1,6 +1,6 @@
 const itemsRouter = require('express').Router({mergeParams: true});
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database(process.env.TEST_DATABASE || '../database.sqlite');
+const db = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite');
 
 // Checks if param is a valid model
 itemsRouter.param('menuItemId', (req, res, next, menuItem) => {
@@ -10,7 +10,7 @@ itemsRouter.param('menuItemId', (req, res, next, menuItem) => {
 		$menu: req.menu.id
 	}, (err, row) => {
 		if (err || !row ) {
-			var newError = new Error("Not Timesheet found");
+			var newError = new Error("Not Items found");
 			newError.status = 404;
 			return next(newError);
 		}
@@ -19,7 +19,7 @@ itemsRouter.param('menuItemId', (req, res, next, menuItem) => {
 	})
 });
 
-// Get all of timesheets for an employee
+// Get all of item for an employee
 itemsRouter.get('/', (req, res, next) => {
 	const menuId = Number(req.menu.id);
 
@@ -27,7 +27,6 @@ itemsRouter.get('/', (req, res, next) => {
 		if (err) {
 			next(err);
 		} else {
-			console.log(rows);
 	   	res.status(200).send({'menuItems': rows});
 		}
   })
@@ -57,7 +56,7 @@ itemsRouter.post('/', (req, res, next) => {
 })
 
 
-// Update Timesheet 
+// Update Items
 itemsRouter.put('/:menuItemId', (req, res, next) => {
 	const updatedMenu = req.body.menuItem;
 
@@ -81,7 +80,7 @@ itemsRouter.put('/:menuItemId', (req, res, next) => {
 	 }) 
 });
 
-// Delete timesheet 
+// Delete item 
 itemsRouter.delete('/:menuItemId', (req, res, next) => {
 	const menuItem = req.params.menuItemId;
 	db.run(`DELETE FROM MenuItem WHERE id = ?1`, {
